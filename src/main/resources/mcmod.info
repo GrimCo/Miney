@@ -1,0 +1,16 @@
+[
+{
+  "modid": "miney",
+  "name": "Miney",
+  "description": "A command based in game currency mod and API.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["ace5852"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
