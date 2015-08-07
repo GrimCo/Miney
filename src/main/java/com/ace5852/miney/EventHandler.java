@@ -1,18 +1,23 @@
 package com.ace5852.miney;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
-public class EventHandler
+public enum EventHandler
 {
+    INSTANCE;
+
     @SubscribeEvent
     public void onPlayerLogin(PlayerLoggedInEvent event)
     {
         NBTTagCompound tag = event.player.getEntityData();
-        boolean firstLogin = tag.getBoolean("MineyStarting");
-        System.out.println(firstLogin);
+        boolean firstLogin = !(tag.getBoolean("MineyStarting"));
         if(firstLogin)
         {
             tag.setBoolean("MineyStarting", true);
@@ -29,22 +34,39 @@ public class EventHandler
                 double newBank =  Math.round((currBank + intrest)*100)/100.0;
                 tag.setDouble("MineyBank", newBank);
                 tag.setLong("MineyIntrest", System.currentTimeMillis());
+
             }
         }
     }
 
-    @SubscribeEvent
-    public void onPlayerRespawn(PlayerRespawnEvent event)
-    {
-        if (Miney.amountLostOnDeath != 0)
-        {
-            NBTTagCompound tag = event.player.getEntityData();
-            double amtToKeep = 1 - Miney.amountLostOnDeath;
-            double currHand = tag.getDouble("Miney");
-            double newHand = Math.round((currHand * amtToKeep)*100)/100.0;
-            tag.setDouble("Miney", newHand);
 
+    @SubscribeEvent
+    public void onLivindDeath(LivingDeathEvent event)
+    {
+        if (event.entity instanceof EntityPlayer)
+        {
+            if (Miney.amountLostOnDeath != 0)
+            {
+                EntityPlayer player = (EntityPlayer) event.entity;
+                NBTTagCompound tag = player.getEntityData();
+                System.out.println(player.getDisplayName());
+                double amtToKeep = 1.0 - Miney.amountLostOnDeath;
+                System.out.println(amtToKeep);
+                double currHand = tag.getDouble("Miney");
+                System.out.println(currHand);
+                double newHand = Math.round((currHand * amtToKeep)*100)/100.0;
+                System.out.println(newHand);
+                tag.setDouble("Miney", newHand);
+
+            }
         }
+    }
+
+
+    public static void register()
+    {
+        MinecraftForge.EVENT_BUS.register(INSTANCE);
+        FMLCommonHandler.instance().bus().register(INSTANCE);
     }
 
 }

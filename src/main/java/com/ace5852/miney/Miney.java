@@ -4,6 +4,7 @@ import com.ace5852.miney.Commands.CommandAddMiney;
 import com.ace5852.miney.Commands.CommandBank;
 import com.ace5852.miney.Commands.CommandMoney;
 import com.ace5852.miney.Commands.CommandPay;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -37,7 +38,8 @@ public class Miney
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
-        MinecraftForge.EVENT_BUS.register(new EventHandler());
+        //MinecraftForge.EVENT_BUS.register(new EventHandler());
+        EventHandler.register();
     }
 
     @Mod.EventHandler
