@@ -1,10 +1,13 @@
 package com.ace5852.miney.Commands;
 
+import com.ace5852.miney.DataHandler;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
 
 public class CommandAddMiney extends CommandBase
 {
@@ -24,6 +27,10 @@ public class CommandAddMiney extends CommandBase
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender)
     {
+        if (!(sender instanceof EntityPlayer))
+        {
+            return false;
+        }
         if (MinecraftServer.getServer().getConfigurationManager().func_152596_g(sender.getEntityWorld().getPlayerEntityByName(sender.getCommandSenderName()).getGameProfile()))
         {
             return true;
@@ -32,33 +39,51 @@ public class CommandAddMiney extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender cmd, String[] args)
+    public void processCommand(ICommandSender sender, String[] args)
     {
-        if (args.length > 1 || args.length > 2)
+        if (sender instanceof EntityPlayer)
         {
-            cmd.addChatMessage(new ChatComponentText(getCommandName()));
-            return;
+            if (args.length < 1 || args.length > 2)
+            {
+                sender.addChatMessage(new ChatComponentText(getCommandUsage(sender)));
+                return;
+            }
+
+            World world = sender.getEntityWorld();
+            EntityPlayer player;
+
+            if (args.length == 1)
+            {
+                player = (EntityPlayer) sender;
+            }
+            else
+            {
+                player = world.getPlayerEntityByName(args[1]);
+                if (player == null)
+                {
+                    sender.addChatMessage(new ChatComponentText("Invalid Player"));
+                    return;
+                }
+            }
+
+            DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
+
+
+            double currentCurrency = data.getHand();
+            double toAdd;
+            try
+            {
+                toAdd = Double.parseDouble(args[0]);
+            }
+            catch (Exception e)
+            {
+                sender.addChatMessage(new ChatComponentText("Invalid Amount"));
+                return;
+            }
+            double newCurrency = toAdd + currentCurrency;
+            data.setHand(newCurrency);
+
+            sender.addChatMessage(new ChatComponentText("Miney Added Successfully"));
         }
-
-        NBTTagCompound tag;
-
-        if (args.length == 1)
-        {
-           tag = cmd.getEntityWorld().getPlayerEntityByName(cmd.getCommandSenderName()).getEntityData();
-        }
-        else
-        {
-            tag = cmd.getEntityWorld().getPlayerEntityByName(args[1]).getEntityData();
-        }
-
-
-        double currentCurrency = tag.getDouble("Miney");
-        double toAdd = Double.parseDouble(args[0]);
-        double newCurrency = Math.round((toAdd + currentCurrency)*100)/100.0;
-        tag.setDouble("Miney", newCurrency);
-
-       // cmd.getEntityWorld().getPlayerEntityByName(cmd.getCommandSenderName()).writeToNBT(new NBTTagCompound().setDouble("Miney", newCurrency));
-
-        cmd.addChatMessage(new ChatComponentText("You now have " + newCurrency + " Miney "));
     }
 }

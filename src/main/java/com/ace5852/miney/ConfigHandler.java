@@ -19,5 +19,9 @@ public class ConfigHandler
         Miney.amountLostOnDeath = config.getFloat("LostOnDeath", "Miney", 0.50f, 0.0f, 1.0f, "Percentage of miney lost on death. 0 = no loss. 1 = all money not in the bank lost. Banked miney is always safe.");
 
         config.save();
+
+
+        //Convert Seconds to Milliseconds
+        Miney.intrestTime = Miney.intrestTime * 1000;
     }
 }

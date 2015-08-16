@@ -1,5 +1,6 @@
 package com.ace5852.miney.API;
 
+import com.ace5852.miney.DataHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -7,43 +8,41 @@ public class MineyAPI
 {
     public double getBankBalance(EntityPlayer player)
     {
-        double currentCurrencyBank = player.getEntityData().getDouble("MineyBank");
-        return currentCurrencyBank;
+        DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
+        return data.getHand();
     }
 
     public double getMineyBalance(EntityPlayer player)
     {
-        double currentCurrencyHand = player.getEntityData().getDouble("Miney");
-        return currentCurrencyHand;
+        DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
+        return data.getBank();
     }
 
     public boolean chargePlayer(EntityPlayer player, double amount)
     {
-        NBTTagCompound tag = player.getEntityData();
-        double currentCurrencyHand = tag.getDouble("Miney");
+        DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
+        double currentCurrencyHand = data.getHand();
         if (amount > currentCurrencyHand)
         {
             return false;
         }
 
         double newCurrencyHand = currentCurrencyHand - amount;
-        newCurrencyHand = Math.round((newCurrencyHand)*100)/100.0;
-        tag.setDouble("Miney", newCurrencyHand);
+        data.setHand(newCurrencyHand);
         return true;
     }
 
     public boolean chargePlayerBank(EntityPlayer player, double amount)
     {
-        NBTTagCompound tag = player.getEntityData();
-        double currentCurrencyBank = tag.getDouble("MineyBank");
+        DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
+        double currentCurrencyBank = data.getBank();
         if (amount > currentCurrencyBank)
         {
             return false;
         }
 
         double newCurrencyBank = currentCurrencyBank - amount;
-        newCurrencyBank = Math.round((newCurrencyBank)*100)/100.0;
-        tag.setDouble("MineyBank", newCurrencyBank);
+        data.setBank(newCurrencyBank);
         return true;
     }
 

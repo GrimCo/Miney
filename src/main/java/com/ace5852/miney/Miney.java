@@ -2,7 +2,7 @@ package com.ace5852.miney;
 
 import com.ace5852.miney.Commands.CommandAddMiney;
 import com.ace5852.miney.Commands.CommandBank;
-import com.ace5852.miney.Commands.CommandMoney;
+import com.ace5852.miney.Commands.CommandMiney;
 import com.ace5852.miney.Commands.CommandPay;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -50,7 +50,7 @@ public class Miney
     @Mod.EventHandler
     public void onServerLoad(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new CommandMoney());
+        event.registerServerCommand(new CommandMiney());
         event.registerServerCommand(new CommandAddMiney());
         event.registerServerCommand(new CommandPay());
         event.registerServerCommand(new CommandBank());

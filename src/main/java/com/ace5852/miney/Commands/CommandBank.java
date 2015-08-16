@@ -1,9 +1,14 @@
 package com.ace5852.miney.Commands;
 
+import com.ace5852.miney.DataHandler;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
+
+import javax.swing.text.html.parser.Entity;
+import javax.xml.crypto.Data;
 
 public class CommandBank extends CommandBase
 {
@@ -22,59 +27,83 @@ public class CommandBank extends CommandBase
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender sender)
     {
-        return true;
-    }
-
-    @Override
-    public void processCommand(ICommandSender cmd, String[] args)
-    {
-        if(args.length != 2)
+        if (sender instanceof EntityPlayer)
         {
-            cmd.addChatMessage(new ChatComponentText("Possible Banking Options: "));
-            cmd.addChatMessage(new ChatComponentText("/bank deposit [amt]"));
-            cmd.addChatMessage(new ChatComponentText("/bank withdraw [amt]"));
-            return;
-        }
-
-        if (args[0].equals("deposit"))
-        {
-            NBTTagCompound tag = cmd.getEntityWorld().getPlayerEntityByName(cmd.getCommandSenderName()).getEntityData();
-            double amt = Double.parseDouble(args[1]);
-            double onHand = tag.getDouble("Miney");
-            double inBank = tag.getDouble("MineyBank");
-            if (amt > onHand)
-            {
-                cmd.addChatMessage(new ChatComponentText("You do not have enough money."));
-                return;
-            }
-            onHand = Math.round((onHand - amt)*100)/100.0;
-            inBank = Math.round((inBank + amt)*100)/100.0;
-
-            tag.setDouble("Miney", onHand);
-            tag.setDouble("MineyBank", inBank);
-        }
-        else if (args[0].equals("withdraw"))
-        {
-            NBTTagCompound tag = cmd.getEntityWorld().getPlayerEntityByName(cmd.getCommandSenderName()).getEntityData();
-            double amt = Double.parseDouble(args[1]);
-            double onHand = tag.getDouble("Miney");
-            double inBank = tag.getDouble("MineyBank");
-            if (amt > inBank)
-            {
-                cmd.addChatMessage(new ChatComponentText("You do not have enough money in the bank."));
-                return;
-            }
-            onHand = Math.round((onHand + amt)*100)/100.0;
-            inBank = Math.round((inBank - amt)*100)/100.0;
-
-            tag.setDouble("Miney", onHand);
-            tag.setDouble("MineyBank", inBank);
+            return true;
         }
         else
         {
-            cmd.addChatMessage(new ChatComponentText("Possible Banking Options: "));
-            cmd.addChatMessage(new ChatComponentText("/bank deposit [amt]"));
-            cmd.addChatMessage(new ChatComponentText("/bank withdraw [amt]"));
+            return false;
+        }
+    }
+
+    @Override
+    public void processCommand(ICommandSender sender, String[] args)
+    {
+        if (sender instanceof EntityPlayer)
+        {
+            if (args.length != 2)
+            {
+                sender.addChatMessage(new ChatComponentText("Possible Banking Options: "));
+                sender.addChatMessage(new ChatComponentText("/bank deposit [amt]"));
+                sender.addChatMessage(new ChatComponentText("/bank withdraw [amt]"));
+                return;
+            }
+
+            EntityPlayer player = (EntityPlayer) sender;
+            DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
+
+            //Try to parse the amount;
+            double amt;
+            try
+            {
+                amt = Double.parseDouble(args[1]);
+                if (amt < 0)
+                {
+                    sender.addChatMessage(new ChatComponentText("Amount must be greater than zero."));
+                    return;
+                }
+            }
+            catch(Exception e)
+            {
+                sender.addChatMessage(new ChatComponentText("Invalid Amount"));
+                return;
+            }
+
+            if (args[0].equals("deposit"))
+            {
+                double onHand = data.getHand();
+                double inBank = data.getBank();
+                if (amt > onHand)
+                {
+                    sender.addChatMessage(new ChatComponentText("You do not have enough money."));
+                    return;
+                }
+                onHand = onHand - amt;
+                inBank = inBank + amt;
+                data.setHand(onHand);
+                data.setBank(inBank);
+            }
+            else if (args[0].equals("withdraw"))
+            {
+                double onHand = data.getHand();
+                double inBank = data.getBank();
+                if (amt > onHand)
+                {
+                    sender.addChatMessage(new ChatComponentText("You do not have enough money."));
+                    return;
+                }
+                onHand = onHand + amt;
+                inBank = inBank - amt;
+                data.setHand(onHand);
+                data.setBank(inBank);
+            }
+            else
+            {
+                sender.addChatMessage(new ChatComponentText("Possible Banking Options: "));
+                sender.addChatMessage(new ChatComponentText("/bank deposit [amt]"));
+                sender.addChatMessage(new ChatComponentText("/bank withdraw [amt]"));
+            }
         }
     }
 }
