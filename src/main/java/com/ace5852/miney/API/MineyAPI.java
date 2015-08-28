@@ -11,7 +11,7 @@ public class MineyAPI
      * @param player The player whose bank account you want.
      * @return The balance of the bank account
      */
-    public double getBankBalance(EntityPlayer player)
+    public static double getBankBalance(EntityPlayer player)
     {
         DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
         return data.getHand();
@@ -22,7 +22,7 @@ public class MineyAPI
      * @param player The player whose on hand balance you want.
      * @return The player's on hand balance.
      */
-    public double getMineyBalance(EntityPlayer player)
+    public static double getMineyBalance(EntityPlayer player)
     {
         DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
         return data.getBank();
@@ -35,7 +35,7 @@ public class MineyAPI
      * @return If the transaction was successful.
      * Currently fails if there is not enough money to complete the transaction.
      */
-    public boolean chargePlayer(EntityPlayer player, double amount)
+    public static boolean chargePlayer(EntityPlayer player, double amount)
     {
         DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
         double currentCurrencyHand = data.getHand();
@@ -57,7 +57,7 @@ public class MineyAPI
      * @return If the transaction was successful.
      * Currently fails if there is not enough money to complete the transaction.
      */
-    public boolean chargePlayerBank(EntityPlayer player, double amount)
+    public static boolean chargePlayerBank(EntityPlayer player, double amount)
     {
         DataHandler data = (DataHandler) player.getExtendedProperties("MineyDataHandler");
         double currentCurrencyBank = data.getBank();
